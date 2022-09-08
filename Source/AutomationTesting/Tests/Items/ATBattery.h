@@ -26,7 +26,7 @@ public:
 	bool operator<(const ATBattery& rhs) const;
 	bool operator<=(const ATBattery& rhs) const;
 	bool operator!=(const ATBattery& rhs) const;
-	
+
 private:
 	float Percent{1.f};
 

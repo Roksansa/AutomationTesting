@@ -42,7 +42,7 @@ bool FMathSqrt::RunTest(const FString& Parameters)
 {
 	AddInfo("Sqrt func testing");
 
-	typedef float Tolerance;
+	using Tolerance = float;
 	const TArray<UE::TEST::TestPayload<TInterval<float>, float>> TestData{
 		{{4.f, Tolerance{KINDA_SMALL_NUMBER}}, 2.f},
 		{{3.f, Tolerance{0.1f}}, 1.7f},

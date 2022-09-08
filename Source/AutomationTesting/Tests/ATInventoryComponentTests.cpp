@@ -79,7 +79,7 @@ bool FNegativeScoresShouldntBeAdded::RunTest(const FString& Parameters)
 	}
 
 	constexpr int32 ScoreLimitConstant = 55;
-	TMap<EInventoryItemType, int32> InvLimits = UE::TEST::InitLimits(InventoryComponent, ScoreLimitConstant);
+	TMap<EInventoryItemType, int32> InvLimits = InitLimits(InventoryComponent, ScoreLimitConstant);
 
 	constexpr int32 PositiveConstant = 1;
 	constexpr int32 NegativeConstant = -55;
@@ -103,7 +103,7 @@ bool FNotNegativeScoresShouldBeAdded::RunTest(const FString& Parameters)
 	}
 
 	constexpr int32 ScoreLimitConstant = 55;
-	TMap<EInventoryItemType, int32> InvLimits = UE::TEST::InitLimits(InventoryComponent, ScoreLimitConstant);
+	TMap<EInventoryItemType, int32> InvLimits = InitLimits(InventoryComponent, ScoreLimitConstant);
 
 	constexpr int32 PositiveConstant = 1;
 	UE::TEST::ForEach<EInventoryItemType>([&](const EInventoryItemType EnumValue, const FName& Name)
@@ -125,9 +125,9 @@ bool FScoreMoreThanLimitCantBeAdded::RunTest(const FString& Parameters)
 	{
 		return false;
 	}
-
+	
 	constexpr int32 ScoreLimitConstant = 55;
-	TMap<EInventoryItemType, int32> InvLimits = UE::TEST::InitLimits(InventoryComponent, ScoreLimitConstant);
+	TMap<EInventoryItemType, int32> InvLimits = InitLimits(InventoryComponent, ScoreLimitConstant);
 
 	constexpr int32 PositiveConstant = 10;
 	UE::TEST::ForEach<EInventoryItemType>([&](const EInventoryItemType EnumValue, const FName& Name)

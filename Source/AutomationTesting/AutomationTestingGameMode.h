@@ -14,6 +14,3 @@ class AAutomationTestingGameMode : public AGameModeBase
 public:
 	AAutomationTestingGameMode();
 };
-
-
-

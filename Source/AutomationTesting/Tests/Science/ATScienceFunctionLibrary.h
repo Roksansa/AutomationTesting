@@ -11,7 +11,7 @@ class UATScienceFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
-	public:
+public:
 	UFUNCTION(BlueprintPure, Category = Science)
 	static int32 Fibonacci(int32 Value);
 };

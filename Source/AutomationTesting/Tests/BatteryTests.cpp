@@ -72,10 +72,10 @@ bool FBatteryTests::RunTest(const FString& Parameters)
 	const ATBattery BatteryHighCopy(0.9f);
 	TestTrueExpr(BatteryHigh == BatteryHighCopy);
 	TestNotSame("Not the same batteries", BatteryHighCopy, BatteryHigh);
-	
-	const ATBattery& BatteryHighRef =BatteryHigh;
+
+	const ATBattery& BatteryHighRef = BatteryHigh;
 	TestSame("The same batteries", BatteryHighRef, BatteryHigh);
-	
+
 	return true;
 }
 

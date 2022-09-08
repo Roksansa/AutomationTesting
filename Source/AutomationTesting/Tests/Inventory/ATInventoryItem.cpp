@@ -12,7 +12,7 @@ AATInventoryItem::AATInventoryItem()
 
 	CollisionComponent->InitSphereRadius(30.f);
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	CollisionComponent->SetCollisionResponseToChannels(ECollisionResponse::ECR_Overlap);
+	CollisionComponent->SetCollisionResponseToChannels(ECR_Overlap);
 	CollisionComponent->SetGenerateOverlapEvents(true);
 	SetRootComponent(CollisionComponent);
 }
@@ -32,4 +32,3 @@ void AATInventoryItem::NotifyActorBeginOverlap(AActor* OtherActor)
 		}
 	}
 }
-

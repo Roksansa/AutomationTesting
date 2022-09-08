@@ -55,7 +55,7 @@ bool ATBattery::operator>=(const ATBattery& rhs) const
 
 bool ATBattery::operator==(const ATBattery& rhs) const
 {
-	return FMath::IsNearlyEqual(GetPercent(),rhs.GetPercent());
+	return FMath::IsNearlyEqual(GetPercent(), rhs.GetPercent());
 }
 
 bool ATBattery::operator<(const ATBattery& rhs) const
@@ -70,7 +70,7 @@ bool ATBattery::operator<=(const ATBattery& rhs) const
 
 bool ATBattery::operator!=(const ATBattery& rhs) const
 {
-	return !FMath::IsNearlyEqual(GetPercent(),rhs.GetPercent());
+	return !FMath::IsNearlyEqual(GetPercent(), rhs.GetPercent());
 }
 
 void ATBattery::SetPercent(float PercentIn)
