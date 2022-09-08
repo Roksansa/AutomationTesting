@@ -8,7 +8,8 @@ enum class EInventoryItemType : uint8
 {
 	SPHERE = 0,
 	CUBE = 1,
-	CYLINDER = 2
+	CYLINDER = 2,
+	CONE,
 };
 
 USTRUCT(BlueprintType)
