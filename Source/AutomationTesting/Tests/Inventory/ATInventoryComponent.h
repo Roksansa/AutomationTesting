@@ -8,7 +8,7 @@
 #include "ATInventoryComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class UATInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -20,15 +20,15 @@ public:
 	bool TryToAddItem(const FInventoryData& Data);
 
 	UFUNCTION(BlueprintCallable)
-	int32 GetInventoryAmountByType(EInventoryItemType Type);
+	int32 GetInventoryAmountByType(EInventoryItemType Type) const;
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TMap<EInventoryItemType,int32> InventoryLimits;
-	
+	TMap<EInventoryItemType, int32> InventoryLimits;
+
 private:
-	TMap<EInventoryItemType,int32> Inventory;
+	TMap<EInventoryItemType, int32> Inventory;
 };

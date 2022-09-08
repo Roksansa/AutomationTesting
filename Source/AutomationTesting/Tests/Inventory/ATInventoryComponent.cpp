@@ -30,7 +30,7 @@ bool UATInventoryComponent::TryToAddItem(const FInventoryData& Data)
 	return true;
 }
 
-int32 UATInventoryComponent::GetInventoryAmountByType(EInventoryItemType Type)
+int32 UATInventoryComponent::GetInventoryAmountByType(EInventoryItemType Type) const
 {
 	return Inventory.Contains(Type) ? Inventory[Type] : 0;
 }
@@ -40,6 +40,7 @@ void UATInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+#if !UE_BUILD_SHIPPING
 	const auto InvEnum = StaticEnum<EInventoryItemType>();
 	check(InvEnum);
 	for (int32 i = 0; i < InvEnum->NumEnums() - 1; i++)
@@ -49,4 +50,5 @@ void UATInventoryComponent::BeginPlay()
 		const bool LimitCheckCond = InventoryLimits.Contains(EnumType) && InventoryLimits[EnumType] >= 0;
 		checkf(LimitCheckCond, TEXT("Limit for %s doesn't exist or less then zero"), *EnumTypeName);
 	}
+#endif
 }
