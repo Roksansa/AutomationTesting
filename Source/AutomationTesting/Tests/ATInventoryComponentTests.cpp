@@ -1,12 +1,12 @@
 // Automation testing project copyright
 #if WITH_AUTOMATION_TESTS
 
-#include "TestUtils.h"
 #include "AutomationTesting/Tests/ATInventoryComponentTests.h"
 #include "CoreMinimal.h"
 #include "Misc/AutomationTest.h"
 #include "Inventory/ATInventoryComponent.h"
 #include "ATTypes.h"
+#include "TestUtils.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FComponentCouldBeCreated, "OriginGame.Inventory.ComponentCouldBeCreated",
 	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);

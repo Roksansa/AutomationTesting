@@ -7,7 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "ATInventoryItem.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class AATInventoryItem : public AActor
 {
 	GENERATED_BODY()
