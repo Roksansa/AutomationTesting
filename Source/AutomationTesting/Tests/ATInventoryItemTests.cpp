@@ -28,6 +28,9 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FInventoryDataShouldBeSetupCorrectly, "OriginGa
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FInventoryItemCanBeTaken, "OriginGame.Inventory.Item.InventoryItemCanBeTaken",
 	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FMeshForEveryInventoryItemShouldExist, "OriginGame.Inventory.Item.MeshForEveryInventoryItemShouldExist",
+	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
+
 constexpr char* NewMapName = "/Game/AutomationTesting/Test/EmptyTestLevel";
 constexpr char* InventoryItemBPName = "Blueprint'/Game/AutomationTesting/Actors/BP_InventoryItem.BP_InventoryItem'";
 constexpr char* InventoryItemBPTestName = "Blueprint'/Game/AutomationTesting/Test/BP_InventoryItem_Test.BP_InventoryItem_Test'";
@@ -85,11 +88,8 @@ bool FBlueprintShouldBeSetupCorrectly::RunTest(const FString& Parameters)
 
 	UE::TEST::ForEach<ECollisionChannel>([&](const ECollisionChannel EnumValue, const FName& Name)
 	{
-		if (EnumValue != ECollisionChannel::ECC_OverlapAll_Deprecated && EnumValue != ECollisionChannel::ECC_MAX)
+		if (EnumValue != ECollisionChannel::ECC_OverlapAll_Deprecated)
 		{
-			// 	const FString EnumTypeName = UEnum::GetValueAsString(EnumValue);
-			// 	const FString InfoString = FString::Printf(TEXT("Deprecated %s"), *EnumTypeName);
-			// TestEqual(InfoString, CollisionComp->GetCollisionResponseToChannel(EnumValue), ECollisionResponse::ECR_Overlap);
 			TestTrueExpr(CollisionComp->GetCollisionResponseToChannel(EnumValue) == ECollisionResponse::ECR_Overlap);
 		}
 	});
@@ -176,6 +176,29 @@ bool FInventoryItemCanBeTaken::RunTest(const FString& Parameters)
 	UGameplayStatics::GetAllActorsOfClass(World, AATInventoryItem::StaticClass(), Actors);
 	TestTrueExpr(CountActors == Actors.Num() + 1);
 
+	return true;
+}
+
+bool FMeshForEveryInventoryItemShouldExist::RunTest(const FString& Parameters)
+{
+	ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.f));
+	LevelScope{NewMapName};
+	UWorld* World = UE::TEST::GetAnyGameWorld();
+	if (!TestNotNull("World exist", World)) { return false; }
+
+	UE::TEST::ForEach<EInventoryItemType>([&](const EInventoryItemType EnumValue, const FName& Name)
+	{
+		const FTransform InitialTransform{FVector{60.f * (static_cast<int>(EnumValue) + 1)}};
+		AATInventoryItem* InventoryItem = UE::TEST::CreateBlueprint<AATInventoryItem>(World, InventoryItemBPTestName, InitialTransform);
+		TestNotNull("Inventory item exist", InventoryItem);
+		const FInventoryData InventoryData{EnumValue, 20};
+		const FLinearColor Color = FLinearColor::Green;
+		UE::TEST::CallFuncByNameWithParams(InventoryItem, "SetInventoryData", {InventoryData.ToString(), Color.ToString()});
+		const auto StaticMeshComp = InventoryItem->FindComponentByClass<UStaticMeshComponent>();
+		TestNotNull("Static mesh component exists", StaticMeshComp);
+		const FString MeshMsg = FString::Printf(TEXT("Static mesh for %s exists"), *UEnum::GetValueAsString(EnumValue));
+		TestNotNull(*MeshMsg, StaticMeshComp->GetStaticMesh().Get());
+	});
 	return true;
 }
 
