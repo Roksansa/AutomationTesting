@@ -128,3 +128,67 @@ void AAutomationTestingCharacter::MoveRight(float Value)
 		AddMovementInput(Direction, Value);
 	}
 }
+
+float AAutomationTestingCharacter::GetHealthPercent() const
+{
+	return Health / HealthData.MaxHealth;
+}
+
+void AAutomationTestingCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	check(HealthData.MaxHealth > 0.0f);
+	Health = HealthData.MaxHealth;
+
+	OnTakeAnyDamage.AddDynamic(this, &AAutomationTestingCharacter::OnAnyDamageReceived);
+}
+
+void AAutomationTestingCharacter::OnAnyDamageReceived(
+	AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	const auto IsAlive = [&]() { return Health > 0.0f; };
+
+	if (Damage <= 0.0f || !IsAlive()) return;
+
+	Health = FMath::Clamp(Health - Damage, 0.0f, HealthData.MaxHealth);
+
+	if (IsAlive())
+	{
+		GetWorldTimerManager().SetTimer(HealTimerHandle, this, &AAutomationTestingCharacter::OnHealing, HealthData.HealRate, true, -1.0f);
+	}
+	else
+	{
+		OnDeath();
+	}
+}
+
+void AAutomationTestingCharacter::OnHealing()
+{
+	Health = FMath::Clamp(Health + HealthData.HealModifier, 0.0f, HealthData.MaxHealth);
+	if (FMath::IsNearlyEqual(Health, HealthData.MaxHealth))
+	{
+		Health = HealthData.MaxHealth;
+		GetWorldTimerManager().ClearTimer(HealTimerHandle);
+	}
+}
+
+void AAutomationTestingCharacter::OnDeath()
+{
+	GetWorldTimerManager().ClearTimer(HealTimerHandle);
+
+	check(GetCharacterMovement());
+	check(GetCapsuleComponent());
+	check(GetMesh());
+
+	GetCharacterMovement()->DisableMovement();
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetSimulatePhysics(true);
+	if (Controller)
+	{
+		Controller->ChangeState(NAME_Spectating);
+	}
+
+	SetLifeSpan(HealthData.LifeSpan);
+}

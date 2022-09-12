@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Tests/ATTypes.h"
 #include "AutomationTestingCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -60,4 +61,23 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	float GetHealthPercent() const;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health")
+	FHealthData HealthData;
+
+	virtual void BeginPlay() override;
+
+private:
+	float Health{0.0f};
+	FTimerHandle HealTimerHandle;
+
+	UFUNCTION()
+	void OnAnyDamageReceived(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+
+	void OnHealing();
+	void OnDeath();
 };
