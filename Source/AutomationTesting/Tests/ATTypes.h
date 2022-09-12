@@ -21,4 +21,9 @@ struct FInventoryData
 	EInventoryItemType Type;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin = "0"))
 	int32 Score;
+
+	FString ToString() const
+	{
+		return FString::Printf(TEXT("(Type=%i,Score=%i)"), Type, Score);
+	}
 };

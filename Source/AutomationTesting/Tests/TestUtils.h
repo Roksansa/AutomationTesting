@@ -28,4 +28,6 @@ T* CreateBlueprint(UWorld* World, const FString& Name, const FTransform& Transfo
 }
 
 UWorld* GetAnyGameWorld();
+
+void CallFuncByNameWithParams(UObject* Object, const FString& FuncName, const TArray<FString>& Params);
 }

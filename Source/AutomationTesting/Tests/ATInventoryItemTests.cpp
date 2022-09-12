@@ -9,6 +9,9 @@
 #include "Inventory/ATInventoryItem.h"
 #include "Components/SphereComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "AutomationTesting/AutomationTestingCharacter.h"
+#include "Inventory/ATInventoryComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 //fix warning - enable streaming in world settings
 //map close automation after ended test -- upd 5.0 ue automationControllerManager - 501 line - GUnrealEd->RequestEndPlayMap();
@@ -19,9 +22,15 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FCppActorCantBeCreated, "OriginGame.Inventory.I
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FBlueprintShouldBeSetupCorrectly, "OriginGame.Inventory.Item.BlueprintShouldBeSetupCorrectly",
 	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FInventoryDataShouldBeSetupCorrectly, "OriginGame.Inventory.Item.InventoryDataShouldBeSetupCorrectly",
+	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FInventoryItemCanBeTaken, "OriginGame.Inventory.Item.InventoryItemCanBeTaken",
+	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
+
 constexpr char* NewMapName = "/Game/AutomationTesting/Test/EmptyTestLevel";
 constexpr char* InventoryItemBPName = "Blueprint'/Game/AutomationTesting/Actors/BP_InventoryItem.BP_InventoryItem'";
-constexpr char* InventoryItemBPTestName = "Blueprint'/Game/Tests/BP_Test_TPSInventoryItem.BP_Test_TPSInventoryItem'";
+constexpr char* InventoryItemBPTestName = "Blueprint'/Game/AutomationTesting/Test/BP_InventoryItem_Test.BP_InventoryItem_Test'";
 
 class LevelScope
 {
@@ -45,40 +54,28 @@ bool FCppActorCantBeCreated::RunTest(const FString& Parameters)
 
 	LevelScope{NewMapName};
 	UWorld* World = UE::TEST::GetAnyGameWorld();
-	if (!TestNotNull("World exist", World))
-	{
-		return false;
-	}
+	if (!TestNotNull("World exist", World)) { return false; }
 
 	const FTransform InitialTransform{FVector{100.f}};
 	const AATInventoryItem* InventoryItem = World->SpawnActor<AATInventoryItem>(AATInventoryItem::StaticClass(), InitialTransform);
-	if (!TestNull("Inventory item exist", InventoryItem))
-	{
-		return false;
-	}
+	if (!TestNull("Inventory item exist", InventoryItem)) { return false; }
 
 	return true;
 }
 
 bool FBlueprintShouldBeSetupCorrectly::RunTest(const FString& Parameters)
 {
-	ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(10.f));
+	ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(1.f));
 	LevelScope{NewMapName};
 	UWorld* World = UE::TEST::GetAnyGameWorld();
-	if (!TestNotNull("World exist", World))
-	{
-		return false;
-	}
+	if (!TestNotNull("World exist", World)) { return false; }
 
 	const FTransform InitialTransform{FVector{60.f}};
 	const AATInventoryItem* InventoryItem = UE::TEST::CreateBlueprint<AATInventoryItem>(World, InventoryItemBPName, InitialTransform);
-	if (!TestNotNull("Inventory item exist", InventoryItem))
-	{
-		return false;
-	}
+	if (!TestNotNull("Inventory item exist", InventoryItem)) { return false; }
 
 	const auto CollisionComp = InventoryItem->FindComponentByClass<USphereComponent>();
-	if (!TestNotNull("Sphere component exists", CollisionComp)) return false;
+	if (!TestNotNull("Sphere component exists", CollisionComp)) { return false; }
 
 	TestTrueExpr(CollisionComp->GetUnscaledSphereRadius() >= 30.0f);
 	TestTrueExpr(CollisionComp->GetCollisionEnabled() == ECollisionEnabled::QueryOnly);
@@ -98,12 +95,87 @@ bool FBlueprintShouldBeSetupCorrectly::RunTest(const FString& Parameters)
 	});
 
 	const auto TextRenderComp = InventoryItem->FindComponentByClass<UTextRenderComponent>();
-	if (!TestNotNull("Text render component exists", TextRenderComp)) return false;
+	if (!TestNotNull("Text render component exists", TextRenderComp)) { return false; }
 
 	const auto StaticMeshComp = InventoryItem->FindComponentByClass<UStaticMeshComponent>();
-	if (!TestNotNull("Static mesh component exists", StaticMeshComp)) return false;
+	if (!TestNotNull("Static mesh component exists", StaticMeshComp)) { return false; }
 
 	TestTrueExpr(StaticMeshComp->GetCollisionEnabled() == ECollisionEnabled::NoCollision);
+	return true;
+}
+
+bool FInventoryDataShouldBeSetupCorrectly::RunTest(const FString& Parameters)
+{
+	ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(1.f));
+	LevelScope{NewMapName};
+	UWorld* World = UE::TEST::GetAnyGameWorld();
+	if (!TestNotNull("World exist", World)) { return false; }
+
+	const FTransform InitialTransform{FVector{60.f}};
+	AATInventoryItem* InventoryItem = UE::TEST::CreateBlueprint<AATInventoryItem>(World, InventoryItemBPTestName, InitialTransform);
+	if (!TestNotNull("Inventory item exist", InventoryItem)) { return false; }
+
+	constexpr FInventoryData InventoryData{EInventoryItemType::CUBE, 20};
+	const FLinearColor Color = FLinearColor::Yellow;
+	UE::TEST::CallFuncByNameWithParams(InventoryItem, "SetInventoryData", {InventoryData.ToString(), Color.ToString()});
+
+	const auto TextRenderComp = InventoryItem->FindComponentByClass<UTextRenderComponent>();
+	if (!TestNotNull("Text render component exists", TextRenderComp)) { return false; }
+
+	TestTrueExpr(TextRenderComp->Text.ToString().Equals(FString::FromInt(InventoryData.Score)));
+	TestTrueExpr(TextRenderComp->TextRenderColor == Color.ToFColor(true));
+
+	const auto StaticMeshComp = InventoryItem->FindComponentByClass<UStaticMeshComponent>();
+	if (!TestNotNull("Static mesh component exists", StaticMeshComp)) { return false; }
+
+	const auto Material = StaticMeshComp->GetMaterial(0);
+	if (!TestNotNull("Material exist", Material)) { return false; }
+
+	FLinearColor MaterialColor;
+	Material->GetVectorParameterValue(FHashedMaterialParameterInfo{"BaseColor"}, MaterialColor);
+	TestTrueExpr(MaterialColor == Color);
+
+	return true;
+}
+
+bool FInventoryItemCanBeTaken::RunTest(const FString& Parameters)
+{
+	ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.f));
+	LevelScope{NewMapName};
+	UWorld* World = UE::TEST::GetAnyGameWorld();
+	if (!TestNotNull("World exist", World)) { return false; }
+
+	const FTransform InitialTransform{FVector{60.f}};
+	AATInventoryItem* InventoryItem = UE::TEST::CreateBlueprint<AATInventoryItem>(World, InventoryItemBPTestName, InitialTransform);
+	if (!TestNotNull("Inventory item exist", InventoryItem)) { return false; }
+
+	constexpr FInventoryData InventoryData{EInventoryItemType::CUBE, 20};
+	const FLinearColor Color = FLinearColor::Yellow;
+	UE::TEST::CallFuncByNameWithParams(InventoryItem, "SetInventoryData", {InventoryData.ToString(), Color.ToString()});
+
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(World, AAutomationTestingCharacter::StaticClass(), Actors);
+	if (!TestTrueExpr(Actors.Num() == 1)) { return false; }
+
+	const auto Character = Cast<AAutomationTestingCharacter>(Actors[0]);
+	if (!TestNotNull("Character exist", Character)) { return false; }
+
+	const auto InventoryComponent = Character->FindComponentByClass<UATInventoryComponent>();
+	if (!TestNotNull("Inventory component exist", InventoryComponent)) { return false; }
+
+	const int32 CurrentCount = InventoryComponent->GetInventoryAmountByType(InventoryData.Type);
+	if (!TestTrueExpr(CurrentCount >= 0)) { return false; }
+
+	UGameplayStatics::GetAllActorsOfClass(World, AATInventoryItem::StaticClass(), Actors);
+	const int32 CountActors = Actors.Num();
+	Character->SetActorLocation(InitialTransform.GetLocation());
+
+	TestTrueExpr(InventoryComponent->GetInventoryAmountByType(InventoryData.Type) - CurrentCount == InventoryData.Score);
+	TestTrueExpr(!IsValid(InventoryItem));
+
+	UGameplayStatics::GetAllActorsOfClass(World, AATInventoryItem::StaticClass(), Actors);
+	TestTrueExpr(CountActors == Actors.Num() + 1);
+
 	return true;
 }
 
