@@ -35,19 +35,7 @@ constexpr char* NewMapName = "/Game/AutomationTesting/Test/EmptyTestLevel";
 constexpr char* InventoryItemBPName = "Blueprint'/Game/AutomationTesting/Actors/BP_InventoryItem.BP_InventoryItem'";
 constexpr char* InventoryItemBPTestName = "Blueprint'/Game/AutomationTesting/Test/BP_InventoryItem_Test.BP_InventoryItem_Test'";
 
-class LevelScope
-{
-public:
-	LevelScope(const FString& MapName)
-	{
-		AutomationOpenMap(MapName);
-	}
-
-	~LevelScope()
-	{
-		ADD_LATENT_AUTOMATION_COMMAND(FExitGameCommand);
-	}
-};
+using namespace UE::TEST;
 
 bool FCppActorCantBeCreated::RunTest(const FString& Parameters)
 {
