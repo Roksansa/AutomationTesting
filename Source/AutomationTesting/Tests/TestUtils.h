@@ -35,6 +35,41 @@ public:
 	}
 };
 
+template <class T>
+class FATUntilLatentCommand : public IAutomationLatentCommand
+{
+public:
+	FATUntilLatentCommand(TFunction<void(T Param)> InCallback, TFunction<void()> InTimeoutCallback, float InTimeout, T CurParam);
+	virtual bool Update() override;
+
+private:
+	TFunction<void(T Param)> Callback;
+	TFunction<void()> TimeoutCallback;
+	T Param;
+	float Timeout;
+};
+
+template <class T>
+FATUntilLatentCommand<T>::FATUntilLatentCommand(TFunction<void(T Type)> InCallback, TFunction<void()> InTimeoutCallback, float InTimeout,
+	T CurParam)
+	: Callback(InCallback), TimeoutCallback(InTimeoutCallback), Param(CurParam), Timeout(InTimeout)
+{
+}
+
+template <class T>
+bool FATUntilLatentCommand<T>::Update()
+{
+	const double NewTime = FPlatformTime::Seconds();
+	if (NewTime - StartTime >= Timeout)
+	{
+		TimeoutCallback();
+		return true;
+	}
+
+	Callback(Param);
+	return false;
+}
+
 template <typename T>
 T* CreateBlueprint(UWorld* World, const FString& Name, const FTransform& Transform = FTransform::Identity)
 {
@@ -49,8 +84,11 @@ T* CreateBlueprintDeferred(UWorld* World, const FString& Name, const FTransform&
 	return (World && Blueprint) ? World->SpawnActorDeferred<T>(Blueprint->GeneratedClass, Transform) : nullptr;
 }
 
+int32 GetActionBindingIndexByName(UInputComponent* InputComp, const FString& ActionName, EInputEvent InputEvent);
+
+int32 GetAxisBindingIndexByName(UInputComponent* InputComp, const FString& AxisName);
+
 UWorld* GetAnyGameWorld();
 
 void CallFuncByNameWithParams(UObject* Object, const FString& FuncName, const TArray<FString>& Params);
-
 }
