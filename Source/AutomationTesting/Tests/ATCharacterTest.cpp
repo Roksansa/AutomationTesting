@@ -63,7 +63,7 @@ bool FCharacterCanBeKilled::RunTest(const FString& Parameters)
 		InitialTransform);
 	if (!TestNotNull("Character exist", Character)) { return false; }
 
-	constexpr FHealthData HealthData{100.f, 11.f, 0.6f, 4.f};
+	constexpr FHealthData HealthData{100.f, 11.f, 0.6f, 2.f};
 	CallFuncByNameWithParams(Character, "SetHealthData", {HealthData.ToString()});
 	Character->FinishSpawning(InitialTransform);
 
@@ -87,15 +87,14 @@ bool FCharacterCanBeKilled::RunTest(const FString& Parameters)
 	TestTrueExpr(Character->GetMesh() && Character->GetMesh()->IsSimulatingPhysics());
 	TestEqual("Life span correctly", Character->GetLifeSpan(), HealthData.LifeSpan);
 
-	auto func = [Character]()
+	auto Func = [Character]()
 	{
 		if (IsValid(Character))
 		{
-			UE_LOG(LogEngineAutomationTests, Error, TEXT("Character is not destroyed"));
+			UE_LOG(LogEngineAutomationTests, Error, TEXT("Character is not destroyed %i"), Character->GetLifeSpan());
 		}
 	};
-	ADD_LATENT_AUTOMATION_COMMAND(FDelayedFunctionLatentCommand(func, HealthData.LifeSpan));
-
+	ADD_LATENT_AUTOMATION_COMMAND(FDelayedFunctionLatentCommand(Func, HealthData.LifeSpan + 0.3f));
 	return true;
 }
 
@@ -121,14 +120,14 @@ bool FCharacterCanBeAutohealed::RunTest(const FString& Parameters)
 	const float HealthDiff = HealthData.MaxHealth - (1.f - Character->GetHealthPercent());
 	const float HealingDuration = HealthData.HealRate * HealthDiff / HealthData.HealModifier;
 
-	auto func = [Character]()
+	auto Func = [Character]()
 	{
 		if (!FMath::IsNearlyEqual(Character->GetHealthPercent(), 1.f))
 		{
 			UE_LOG(LogEngineAutomationTests, Error, TEXT("Character health is not full"));
 		}
 	};
-	ADD_LATENT_AUTOMATION_COMMAND(FDelayedFunctionLatentCommand(func, HealingDuration));
+	ADD_LATENT_AUTOMATION_COMMAND(FDelayedFunctionLatentCommand(Func, HealingDuration));
 
 	return true;
 }

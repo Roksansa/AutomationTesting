@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "Tests/AutomationCommon.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogATJsonUtils1, Verbose, Verbose);
 
 namespace UE::TEST
 {
@@ -52,7 +53,7 @@ private:
 template <class T>
 FATUntilLatentCommand<T>::FATUntilLatentCommand(TFunction<void(T Type)> InCallback, TFunction<void()> InTimeoutCallback, float InTimeout,
 	T CurParam)
-	: Callback(InCallback), TimeoutCallback(InTimeoutCallback), Param(CurParam), Timeout(InTimeout)
+	: Callback(MoveTemp(InCallback)), TimeoutCallback(InTimeoutCallback), Param(CurParam), Timeout(InTimeout)
 {
 }
 
@@ -91,4 +92,6 @@ int32 GetAxisBindingIndexByName(UInputComponent* InputComp, const FString& AxisN
 UWorld* GetAnyGameWorld();
 
 void CallFuncByNameWithParams(UObject* Object, const FString& FuncName, const TArray<FString>& Params);
+
+FString GetTestDataDir();
 }

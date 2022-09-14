@@ -8,6 +8,8 @@
 #include "GameFramework/Character.h"
 #include "Inventory/ATInventoryItem.h"
 #include "Kismet/GameplayStatics.h"
+#include "JsonUtils.h"
+#include "Input/ATInputRecordingUtils.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FInventoryItemCanBeTakenOnJump, "OriginGame.Character.Input.InventoryItemCanBeTakenOnJump",
 	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
@@ -17,6 +19,9 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FInventoryItemCantBeTakenOnJumpIfTooHigh,
 	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FAllItemsAreTakenOnMovement, "OriginGame.Character.Input.AllItemsAreTakenOnMovement",
+	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FAllItemsAreTakenOnRecordingMovement, "OriginGame.Character.Input.AllItemsAreTakenOnRecordingMovement",
 	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
 
 using namespace UE::TEST;
@@ -128,6 +133,92 @@ bool FAllItemsAreTakenOnMovement::RunTest(const FString& Parameters)
 		TArray<AActor*> NewInventoryItems;
 		UGameplayStatics::GetAllActorsOfClass(World, AATInventoryItem::StaticClass(), NewInventoryItems);
 		TestTrueExpr(NewInventoryItems.Num() == 0);
+		return true;
+	};
+	ADD_LATENT_AUTOMATION_COMMAND(FFunctionLatentCommand(FuncEndTest));
+
+	return true;
+}
+
+class FSimulateMovementLatentCommand : public IAutomationLatentCommand
+{
+public:
+	FSimulateMovementLatentCommand(UWorld* InWorld, UInputComponent* InInputComponent, const TArray<FBindingsData>& InBindingsData)
+		: World(InWorld), InputComponent(InInputComponent), BindingsData(InBindingsData)
+	{
+	}
+
+	virtual bool Update() override
+	{
+		if (!World || !InputComponent) return true;
+
+		if (WorldStartTime == 0.0f)
+		{
+			WorldStartTime = World->TimeSeconds;
+		}
+		while ((World->TimeSeconds - WorldStartTime > BindingsData[Index].GlobalTime) || FMath::IsNearlyZero(
+			       (World->TimeSeconds - WorldStartTime) - BindingsData[Index].GlobalTime, 3*KINDA_SMALL_NUMBER))
+		{
+			for (const auto& AxisValue : BindingsData[Index].AxisValue)
+			{
+				const int32 BindingIndex = GetAxisBindingIndexByName(InputComponent, AxisValue.Name.ToString());
+				if (BindingIndex != INDEX_NONE) { InputComponent->AxisBindings[BindingIndex].AxisDelegate.Execute(AxisValue.Value); }
+			}
+			if (++Index >= BindingsData.Num()) return true;
+		}
+
+		return false;
+	}
+
+private:
+	const UWorld* World;
+	UInputComponent* InputComponent;
+	const TArray<FBindingsData> BindingsData;
+	int32 Index{0};
+	float WorldStartTime{0.0f};
+};
+
+bool FAllItemsAreTakenOnRecordingMovement::RunTest(const FString& Parameters)
+{
+	const auto Level = LevelScope("/Game/ThirdPerson/Maps/ThirdPersonMap");
+
+	UWorld* World = GetAnyGameWorld();
+	if (!TestNotNull("World exists", World)) { return false; }
+
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(World, 0);
+	if (!TestNotNull("Character exists", Character)) { return false; }
+
+	TArray<AActor*> InventoryItems;
+	UGameplayStatics::GetAllActorsOfClass(World, AATInventoryItem::StaticClass(), InventoryItems);
+	TestTrueExpr(InventoryItems.Num() == 5);
+
+	const FString FileName = GetTestDataDir().Append("CharacterTestInput.json");
+	FInputData InputData;
+	if (!JsonUtils::ReadInputData(FileName, InputData)) { return false; }
+	if (!TestTrue("Input data is not empty", InputData.Bindings.Num() > 0)) { return false; }
+
+	GEngine->bUseFixedFrameRate = true;
+	GEngine->FixedFrameRate = InputData.FixedCountFps;
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(World, 0);
+	if (!TestNotNull("PlayerController exists", PlayerController)) { return false; }
+
+	Character->SetActorTransform(InputData.InitialTransform);
+	PlayerController->SetControlRotation(InputData.InitialTransform.Rotator());
+
+	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(1.0f));
+
+	//simulateinput
+	//work only fixed rate fps!!! equal write and read!
+	ADD_LATENT_AUTOMATION_COMMAND(FSimulateMovementLatentCommand(World, Character->InputComponent, InputData.Bindings));
+
+	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(1.0f));
+	auto FuncEndTest = [=]()
+	{
+		TArray<AActor*> NewInventoryItems;
+		UGameplayStatics::GetAllActorsOfClass(World, AATInventoryItem::StaticClass(), NewInventoryItems);
+		TestTrueExpr(NewInventoryItems.Num() == 1);
+		GEngine->ReloadConfig();
 		return true;
 	};
 	ADD_LATENT_AUTOMATION_COMMAND(FFunctionLatentCommand(FuncEndTest));

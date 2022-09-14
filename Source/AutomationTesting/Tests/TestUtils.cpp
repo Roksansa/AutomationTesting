@@ -57,4 +57,9 @@ void CallFuncByNameWithParams(UObject* Object, const FString& FuncName, const TA
 	FOutputDeviceNull OutputDeviceNull;
 	Object->CallFunctionByNameWithArguments(*Command, OutputDeviceNull, nullptr, true);
 }
+
+FString GetTestDataDir()
+{
+	return FPaths::GameSourceDir().Append("AutomationTesting/Tests/Data/");
+}
 }
