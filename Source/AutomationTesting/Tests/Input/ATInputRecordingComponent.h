@@ -7,6 +7,8 @@
 #include "Components/ActorComponent.h"
 #include "ATInputRecordingComponent.generated.h"
 
+class UPlayerInput;
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class UATInputRecordingComponent : public UActorComponent
 {
@@ -28,6 +30,8 @@ public:
 	float FixedCountFps = 60.f;
 
 private:
+	UPROPERTY()
+	UPlayerInput* PlayerInput;
 	FInputData InputData;
 
 	FBindingsData MakeBindingsData() const;

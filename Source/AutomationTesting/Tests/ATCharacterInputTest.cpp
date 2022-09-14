@@ -156,14 +156,31 @@ public:
 		{
 			WorldStartTime = World->TimeSeconds;
 		}
-		while ((World->TimeSeconds - WorldStartTime > BindingsData[Index].GlobalTime) || FMath::IsNearlyZero(
-			       (World->TimeSeconds - WorldStartTime) - BindingsData[Index].GlobalTime, 3*KINDA_SMALL_NUMBER))
+
+		while (World->TimeSeconds - WorldStartTime > BindingsData[Index].GlobalTime || FMath::IsNearlyZero(
+			       (World->TimeSeconds - WorldStartTime) - BindingsData[Index].GlobalTime, 3 * KINDA_SMALL_NUMBER))
 		{
 			for (const auto& AxisValue : BindingsData[Index].AxisValue)
 			{
 				const int32 BindingIndex = GetAxisBindingIndexByName(InputComponent, AxisValue.Name.ToString());
-				if (BindingIndex != INDEX_NONE) { InputComponent->AxisBindings[BindingIndex].AxisDelegate.Execute(AxisValue.Value); }
+				if (BindingIndex == INDEX_NONE) { continue; }
+				InputComponent->AxisBindings[BindingIndex].AxisDelegate.Execute(AxisValue.Value);
 			}
+
+			if (Index > 0)
+			{
+				for (int32 i = 0; i < BindingsData[Index].ActionValue.Num(); ++i)
+				{
+					const FActionData& ActionData = BindingsData[Index].ActionValue[i];
+					const FActionData& PrevActionData = BindingsData[Index - 1].ActionValue[i];
+					if (!ActionData.State || ActionData.State == PrevActionData.State) { continue; }
+					const FString ActionName = ActionData.Name.ToString();
+					const int32 ActionIndex = GetActionBindingIndexByName(InputComponent, ActionName, ActionData.InputEvent);
+					if (ActionIndex == INDEX_NONE) { continue; }
+					InputComponent->GetActionBinding(ActionIndex).ActionDelegate.Execute(ActionData.Key);
+				}
+			}
+
 			if (++Index >= BindingsData.Num()) return true;
 		}
 
@@ -180,6 +197,9 @@ private:
 
 bool FAllItemsAreTakenOnRecordingMovement::RunTest(const FString& Parameters)
 {
+	const FString ExpectedWarnMsg = FString::Printf(TEXT("Invalid world bounds"));
+	AddExpectedError(ExpectedWarnMsg, EAutomationExpectedErrorFlags::Contains, 2);
+	
 	const auto Level = LevelScope("/Game/ThirdPerson/Maps/ThirdPersonMap");
 
 	UWorld* World = GetAnyGameWorld();

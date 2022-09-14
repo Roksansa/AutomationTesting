@@ -18,12 +18,33 @@ struct FAxisData
 };
 
 USTRUCT()
+struct FActionData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName Name;
+
+	UPROPERTY()
+	FKey Key;
+
+	UPROPERTY()
+	TEnumAsByte<EInputEvent> InputEvent;
+
+	UPROPERTY()
+	bool State;
+};
+
+USTRUCT()
 struct FBindingsData
 {
 	GENERATED_BODY()
 
 	UPROPERTY()
 	TArray<FAxisData> AxisValue;
+
+	UPROPERTY()
+	TArray<FActionData> ActionValue;
 
 	UPROPERTY()
 	float GlobalTime = 0.f;
