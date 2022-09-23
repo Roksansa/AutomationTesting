@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "AutomationTestingGameMode.generated.h"
-
 UCLASS(minimalapi)
 class AAutomationTestingGameMode : public AGameModeBase
 {

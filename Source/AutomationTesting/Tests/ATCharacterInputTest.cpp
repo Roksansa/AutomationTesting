@@ -21,7 +21,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FInventoryItemCantBeTakenOnJumpIfTooHigh,
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FAllItemsAreTakenOnMovement, "OriginGame.Character.Input.AllItemsAreTakenOnMovement",
 	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FAllItemsAreTakenOnRecordingMovement, "OriginGame.Character.Input.AllItemsAreTakenOnRecordingMovement",
+IMPLEMENT_COMPLEX_AUTOMATION_TEST(FAllItemsAreTakenOnRecordingMovement, "OriginGame.Character.Input.AllItemsAreTakenOnRecordingMovement",
 	EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority);
 
 using namespace UE::TEST;
@@ -195,12 +195,38 @@ private:
 	float WorldStartTime{0.0f};
 };
 
+void FAllItemsAreTakenOnRecordingMovement::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FString>& OutTestCommands) const
+{
+	struct FTestData
+	{
+		FString TestName;
+		FString MapPath;
+		FString JsonName;
+	};
+
+	const TArray<FTestData> TestData = //
+	{
+		{"MainMap", "/Game/ThirdPerson/Maps/ThirdPersonMap", "CharacterTestInput.json"},                      //
+		{"CustomMap", "/Game/AutomationTesting/Test/ThirdPersonMap_Custom", "CharacterTestInputCustom.json"}, //
+	};
+
+	for (const auto OneTestData : TestData)
+	{
+		OutBeautifiedNames.Add(OneTestData.TestName);
+		OutTestCommands.Add(FString::Printf(TEXT("%s,%s"), *OneTestData.MapPath, *OneTestData.JsonName));
+	}
+}
+
 bool FAllItemsAreTakenOnRecordingMovement::RunTest(const FString& Parameters)
 {
 	const FString ExpectedWarnMsg = FString::Printf(TEXT("Invalid world bounds"));
 	AddExpectedError(ExpectedWarnMsg, EAutomationExpectedErrorFlags::Contains, 2);
-	
-	const auto Level = LevelScope("/Game/ThirdPerson/Maps/ThirdPersonMap");
+
+	TArray<FString> ParsedParams;
+	Parameters.ParseIntoArray(ParsedParams, TEXT(","));
+	if (!TestTrue("Map name and JSON params should exist", ParsedParams.Num() == 2)) return false;
+
+	const auto Level = LevelScope(ParsedParams[0]);
 
 	UWorld* World = GetAnyGameWorld();
 	if (!TestNotNull("World exists", World)) { return false; }
@@ -212,7 +238,7 @@ bool FAllItemsAreTakenOnRecordingMovement::RunTest(const FString& Parameters)
 	UGameplayStatics::GetAllActorsOfClass(World, AATInventoryItem::StaticClass(), InventoryItems);
 	TestTrueExpr(InventoryItems.Num() == 5);
 
-	const FString FileName = GetTestDataDir().Append("CharacterTestInput.json");
+	const FString FileName = GetTestDataDir().Append(ParsedParams[1]);
 	FInputData InputData;
 	if (!JsonUtils::ReadInputData(FileName, InputData)) { return false; }
 	if (!TestTrue("Input data is not empty", InputData.Bindings.Num() > 0)) { return false; }

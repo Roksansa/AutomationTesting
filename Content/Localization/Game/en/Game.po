@@ -1,0 +1,122 @@
+﻿# Game English translation.
+# Copyright Epic Games, Inc. All Rights Reserved.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Game\n"
+"POT-Creation-Date: 2022-09-22 21:31\n"
+"PO-Revision-Date: 2022-09-22 21:31\n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Key:	Anti-Aliasing_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,Anti-Aliasing_Loc"
+msgid "Anti-Aliasing"
+msgstr "Anti-Aliasing"
+
+#. Key:	CONE_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,CONE_Loc"
+msgid "CONE"
+msgstr "CONE"
+
+#. Key:	CUBE_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,CUBE_Loc"
+msgid "CUBE"
+msgstr "CUBE"
+
+#. Key:	CYLINDER_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,CYLINDER_Loc"
+msgid "CYLINDER"
+msgstr "CYLINDER"
+
+#. Key:	Epic_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,Epic_Loc"
+msgid "Epic"
+msgstr "Epic"
+
+#. Key:	GlobalIllumination_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,GlobalIllumination_Loc"
+msgid "GlobalIllumination"
+msgstr "GlobalIllumination"
+
+#. Key:	GraphicsSetting_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,GraphicsSetting_Loc"
+msgid "Graphics Setting"
+msgstr "Graphics Setting"
+
+#. Key:	High_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,High_Loc"
+msgid "High"
+msgstr "High"
+
+#. Key:	Low_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#. InfoMetaData:	"Comment" : "This is a comment about hello world"
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,Low_Loc"
+msgid "Low"
+msgstr "Low"
+
+#. Key:	Medium_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#. InfoMetaData:	"Comment" : "This is a comment about goodbye world"
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,Medium_Loc"
+msgid "Medium"
+msgstr "Medium"
+
+#. Key:	PostProcessing_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,PostProcessing_Loc"
+msgid "PostProcessing"
+msgstr "PostProcessing"
+
+#. Key:	Shadows_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,Shadows_Loc"
+msgid "Shadows"
+msgstr "Shadows"
+
+#. Key:	SPHERE_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,SPHERE_Loc"
+msgid "SPHERE"
+msgstr "SPHERE"
+
+#. Key:	StartBenchmark_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,StartBenchmark_Loc"
+msgid "Start benchmark"
+msgstr "Start benchmark"
+
+#. Key:	Textures_Loc
+#. SourceLocation:	/Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+#: /Game/AutomationTesting/Data/ST_MyLocal.ST_MyLocal
+msgctxt "ST_MyLocal,Textures_Loc"
+msgid "Textures"
+msgstr "Textures"
+
