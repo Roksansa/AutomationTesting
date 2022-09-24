@@ -1,8 +1,6 @@
 ﻿#pragma once
 #include "Tests/AutomationCommon.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogATJsonUtils1, Verbose, Verbose);
-
 namespace UE::TEST
 {
 template <typename TestType, typename ExpectedType>
@@ -88,6 +86,8 @@ T* CreateBlueprintDeferred(UWorld* World, const FString& Name, const FTransform&
 int32 GetActionBindingIndexByName(UInputComponent* InputComp, const FString& ActionName, EInputEvent InputEvent);
 
 int32 GetAxisBindingIndexByName(UInputComponent* InputComp, const FString& AxisName);
+
+void ExecuteInputPressedAction(UInputComponent* InputComponent, const FString& ActionName, const FKey& Key);
 
 UWorld* GetAnyGameWorld();
 

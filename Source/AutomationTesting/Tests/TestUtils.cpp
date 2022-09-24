@@ -29,6 +29,18 @@ int32 GetAxisBindingIndexByName(UInputComponent* InputComp, const FString& AxisN
 	return AxisIndex;
 }
 
+void ExecuteInputPressedAction(UInputComponent* InputComponent, const FString& ActionName, const FKey& Key)
+{
+	if (!InputComponent) return;
+
+	const int32 ActionIndex = GetActionBindingIndexByName(InputComponent, ActionName, EInputEvent::IE_Pressed);
+	if (ActionIndex != INDEX_NONE)
+	{
+		const auto ActionBind = InputComponent->GetActionBinding(ActionIndex);
+		ActionBind.ActionDelegate.Execute(Key);
+	}
+}
+
 UWorld* GetAnyGameWorld()
 {
 	UWorld* TestWorld = nullptr;

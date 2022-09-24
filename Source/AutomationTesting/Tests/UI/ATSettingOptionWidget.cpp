@@ -17,18 +17,23 @@ void UATSettingOptionWidget::Init(UATGameSetting* CurSetting)
 void UATSettingOptionWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+	//PrevSettingButton->OnClicked.AddDynamic(CreateLambda)
 
 	SButton* ButtonWidget = static_cast<SButton*>(&(PrevSettingButton->TakeWidget().Get()));
 	ButtonWidget->SetOnClicked(FOnClicked::CreateLambda([this]()
-	{
-		OnClickedSettingButton(false);
-		return FReply::Handled();
-	}));
+	 {
+	 	OnClickedSettingButton(false);
+		//For bp used
+		PrevSettingButton->OnClicked.Broadcast();
+	 	return FReply::Handled();
+	 }));
 
 	ButtonWidget = static_cast<SButton*>(&(NextSettingButton->TakeWidget().Get()));
 	ButtonWidget->SetOnClicked(FOnClicked::CreateLambda([this]()
 	{
 		OnClickedSettingButton(true);
+		//For bp used
+		NextSettingButton->OnClicked.Broadcast();
 		return FReply::Handled();
 	}));
 }

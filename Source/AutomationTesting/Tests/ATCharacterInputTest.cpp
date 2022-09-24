@@ -32,12 +32,7 @@ bool FJumpLatentCommand::Update()
 {
 	if (!Character) return true;
 
-	const int32 ActionIndex = GetActionBindingIndexByName(Character->InputComponent, "Jump", EInputEvent::IE_Pressed);
-	if (ActionIndex != INDEX_NONE)
-	{
-		const auto JumpActionBind = Character->InputComponent->GetActionBinding(ActionIndex);
-		JumpActionBind.ActionDelegate.Execute(EKeys::SpaceBar);
-	}
+	ExecuteInputPressedAction(Character->InputComponent, "Jump", EKeys::SpaceBar);
 	return true;
 }
 
