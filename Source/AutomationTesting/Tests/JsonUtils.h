@@ -12,28 +12,32 @@ DEFINE_LOG_CATEGORY_STATIC(LogATJsonUtils, Verbose, Verbose);
 class JsonUtils
 {
 public:
-	template <class ConverterType>
+	template <class ConverterType, typename TEnableIf<TIsDerivedFrom<typename TRemovePointer<decltype(ConverterType::StaticStruct())>::Type,
+		UScriptStruct>::Value, bool>::Type = true>
 	static bool WriteInputData(const FString& FullPathFileName, const ConverterType& InInputData);
-	template <class ConverterType>
+
+	template <class ConverterType, typename TEnableIf<TIsDerivedFrom<typename TRemovePointer<decltype(ConverterType::StaticStruct())>::Type,
+		UScriptStruct>::Value, bool>::Type = true>
 	static bool ReadInputData(const FString& FullPathFileName, ConverterType& OutInputData);
 
 private:
-	static bool WriteInputData(const FString& FullPathFileName,const TSharedPtr<FJsonObject>& MainJsonObject);
-	static bool ReadInputData(const FString& FullPathFileName, const UStruct* StructDefinition, void* OutStruct);
+	static bool WriteInputDataInner(const FString& FullPathFileName, const TSharedPtr<FJsonObject>& MainJsonObject);
+	static bool ReadInputDataInner(const FString& FullPathFileName, const UStruct* StructDefinition, void* OutStruct);
 };
 
-template <class ConverterType>
+template <class ConverterType, typename TEnableIf<TIsDerivedFrom<typename TRemovePointer<decltype(ConverterType::StaticStruct())>::Type,
+	UScriptStruct>::Value, bool>::Type>
 bool JsonUtils::WriteInputData(const FString& FullPathFileName, const ConverterType& InInputData)
 {
 	TSharedPtr<FJsonObject> MainJsonObject = FJsonObjectConverter::UStructToJsonObject(InInputData);
 	if (!MainJsonObject.IsValid()) { return false; }
-	return WriteInputData(FullPathFileName, MainJsonObject);
+	return WriteInputDataInner(FullPathFileName, MainJsonObject);
 }
 
-template <class ConverterType>
+template <class ConverterType, typename TEnableIf<TIsDerivedFrom<typename TRemovePointer<decltype(ConverterType::StaticStruct())>::Type,
+	UScriptStruct>::Value, bool>::Type>
 bool JsonUtils::ReadInputData(const FString& FullPathFileName, ConverterType& OutInputData)
 {
-	return ReadInputData(FullPathFileName, ConverterType::StaticStruct(), &OutInputData);
+	return ReadInputDataInner(FullPathFileName, ConverterType::StaticStruct(), &OutInputData);
 }
-
 }

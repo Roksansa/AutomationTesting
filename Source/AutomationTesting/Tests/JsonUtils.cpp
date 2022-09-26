@@ -11,7 +11,7 @@ using namespace UE::TEST;
 
 DEFINE_LOG_CATEGORY_STATIC(LogATJsonUtils, Verbose, Verbose);
 
-bool JsonUtils::WriteInputData(const FString& FullPathFileName, const TSharedPtr<FJsonObject>& MainJsonObject)
+bool JsonUtils::WriteInputDataInner(const FString& FullPathFileName, const TSharedPtr<FJsonObject>& MainJsonObject)
 {
 	FString OutputString;
 	const TSharedRef<TJsonWriter<>> JsonWriter = TJsonWriterFactory<>::Create(&OutputString);
@@ -35,7 +35,7 @@ bool JsonUtils::WriteInputData(const FString& FullPathFileName, const TSharedPtr
 	return true;
 }
 
-bool JsonUtils::ReadInputData(const FString& FullPathFileName, const UStruct* StructDefinition, void* OutStruct)
+bool JsonUtils::ReadInputDataInner(const FString& FullPathFileName, const UStruct* StructDefinition, void* OutStruct)
 {
 	TSharedPtr<FJsonObject> MainJsonObject;
 	FString FileContentString;
