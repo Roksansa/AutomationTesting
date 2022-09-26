@@ -11,7 +11,7 @@ public class AutomationTesting : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
 			"Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay",
-			"Json", "JsonUtilities", "Slate", "UMG", "SlateCore"
+			"Json", "JsonUtilities", "Slate", "UMG", "SlateCore", "FunctionalTesting"
 		});
 		PrivateIncludePaths.AddRange(new string[] { Name });
 	}
